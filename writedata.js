@@ -64,7 +64,7 @@ request(url, function (error, response, body) {
     $('.event-table tr').each(function(i, elem) {
 
       var eventDate = getADate($(this).find('td[itemprop=startDate]').text().trim());
-      var dateString = (eventDate.getMonth() + 1) + '-' + eventDate.getDate() + '-' + eventDate.getFullYear();
+      var dateString = ('0' + (eventDate.getMonth() + 1)).slice(-2) + '-' + ('0' + eventDate.getDate()).slice(-2) + '-' + eventDate.getFullYear();
 
       if (!groupedEvents[dateString]) {
         groupedEvents[dateString] = [];
@@ -76,23 +76,35 @@ request(url, function (error, response, body) {
         link: 'https://www.ticketsource.co.uk' + $(this).find('a[itemprop=url]').attr('href'),
         date: eventDate,
         day: dateString,
+        time:eventDate.toTimeString().substring(0, 5),
         ticketsAvailable: $(this).find('td.ticket-count').text(),
         venueName: $(this).find('span[itemprop=name]').text(),
         venueLink: 'https://www.ticketsource.co.uk' + $(this).find('td[itemprop=location] > a').attr('href')
       });
 
-
     });
 
-    output = 'var tourData = ' + JSON.stringify(groupedEvents, null, 2) + ';';
+    output = 'var tourData = {\n';
+
+    for (var day in groupedEvents) {
+      if (groupedEvents.hasOwnProperty(day)) {
+        var daysEvents = groupedEvents[day];
+        output += '\t\'' + day + '\' : \'';
+        for (var i = 0; i < daysEvents.length; i++) {
+          output += '<a target="_blank" href="' + daysEvents[i].link + '">';
+          output += daysEvents[i].time + '</a> ';
+        }
+        output += '\',\n';
+      }
+    }
+
+    output += '};';
 
     fs.writeFile('tours.js', output, function (err) {
       if (err) {
         return console.log(err);
       }
-      console.log('Hello World > helloworld.txt');
     });
-    //console.log(output);
   } else {
     console.log("We’ve encountered an error: " + error);
   }

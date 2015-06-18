@@ -3,3 +3,4 @@ lib/
 node_modules/
 run/
 eventdata.json
+tours.js
