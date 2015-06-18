@@ -3,14 +3,14 @@ var fs = require('fs');
 
 http.createServer(function (request, response) {
 
-  fs.readFile('./eventdata.json', function(error, content) {
+  fs.readFile('./tours.jn', function(error, content) {
     if (error) {
       response.writeHead(500);
       response.end();
     }
     else {
       response.setHeader('Access-Control-Allow-Origin', '*');
-      response.writeHead(200, { 'Content-Type': 'application/json' });
+      response.writeHead(200, { 'Content-Type': 'application/javascript' });
       response.end(content, 'utf-8');
     }
   });
