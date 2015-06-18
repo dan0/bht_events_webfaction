@@ -3,7 +3,7 @@ var fs = require('fs');
 
 http.createServer(function (request, response) {
 
-  fs.readFile('./tours.jn', function(error, content) {
+  fs.readFile('./tours.js', function(error, content) {
     if (error) {
       response.writeHead(500);
       response.end();
