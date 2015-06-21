@@ -1,5 +1,6 @@
 var http = require('http');
 var fs = require('fs');
+var datafetcher = require('./writedata');
 
 http.createServer(function (request, response) {
 
@@ -17,3 +18,8 @@ http.createServer(function (request, response) {
 
 }).listen(32494);
 console.log('Server running at http://127.0.0.1:8125/');
+
+//Urgh.  Shame
+datafetcher.fetch();
+setInterval(datafetcher.fetch, 1000 * 60 * 30);
+

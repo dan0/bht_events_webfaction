@@ -54,58 +54,65 @@ function getADate(str) {
   return  date;
 }
 
-request(url, function (error, response, body) {
-  if (!error) {
-    var $ = cheerio.load(body);
-    var events = [];
-    var groupedEvents = {};
-    var output = '';
+function fetch() {
+  request(url, function (error, response, body) {
+    if (!error) {
+      var $ = cheerio.load(body);
+      var events = [];
+      var groupedEvents = {};
+      var output = '';
 
-    $('.event-table tr').each(function(i, elem) {
+      $('.event-table tr').each(function(i, elem) {
 
-      var eventDate = getADate($(this).find('td[itemprop=startDate]').text().trim());
-      var dateString = ('0' + (eventDate.getMonth() + 1)).slice(-2) + '-' + ('0' + eventDate.getDate()).slice(-2) + '-' + eventDate.getFullYear();
+        var eventDate = getADate($(this).find('td[itemprop=startDate]').text().trim());
+        var dateString = ('0' + (eventDate.getMonth() + 1)).slice(-2) + '-' + ('0' + eventDate.getDate()).slice(-2) + '-' + eventDate.getFullYear();
 
-      if (!groupedEvents[dateString]) {
-        groupedEvents[dateString] = [];
-      }
+        if (!groupedEvents[dateString]) {
+          groupedEvents[dateString] = [];
+        }
 
-      groupedEvents[dateString].push({
-         id: $(this).data('id'),
-        name: $(this).find('td[itemprop=name]').text().trim(),
-        link: 'https://www.ticketsource.co.uk' + $(this).find('a[itemprop=url]').attr('href'),
-        date: eventDate,
-        day: dateString,
-        time:eventDate.toTimeString().substring(0, 5),
-        ticketsAvailable: $(this).find('td.ticket-count').text(),
-        venueName: $(this).find('span[itemprop=name]').text(),
-        venueLink: 'https://www.ticketsource.co.uk' + $(this).find('td[itemprop=location] > a').attr('href')
+        groupedEvents[dateString].push({
+           id: $(this).data('id'),
+          name: $(this).find('td[itemprop=name]').text().trim(),
+          link: 'https://www.ticketsource.co.uk' + $(this).find('a[itemprop=url]').attr('href'),
+          date: eventDate,
+          day: dateString,
+          time:eventDate.toTimeString().substring(0, 5),
+          ticketsAvailable: $(this).find('td.ticket-count').text(),
+          venueName: $(this).find('span[itemprop=name]').text(),
+          venueLink: 'https://www.ticketsource.co.uk' + $(this).find('td[itemprop=location] > a').attr('href')
+        });
+
       });
 
-    });
+      output = 'var tourData = {\n';
 
-    output = 'var tourData = {\n';
-
-    for (var day in groupedEvents) {
-      if (groupedEvents.hasOwnProperty(day)) {
-        var daysEvents = groupedEvents[day];
-        output += '\t\'' + day + '\' : \'';
-        for (var i = 0; i < daysEvents.length; i++) {
-          output += '<a target="_blank" href="' + daysEvents[i].link + '">';
-          output += daysEvents[i].time + '</a> ';
+      for (var day in groupedEvents) {
+        if (groupedEvents.hasOwnProperty(day)) {
+          var daysEvents = groupedEvents[day];
+          output += '\t\'' + day + '\' : \'';
+          for (var i = 0; i < daysEvents.length; i++) {
+            output += '<a target="_blank" href="' + daysEvents[i].link + '">';
+            output += daysEvents[i].time + '</a> ';
+          }
+          output += '\',\n';
         }
-        output += '\',\n';
       }
+
+      output += '};';
+
+      fs.writeFile('tours.js', output, function (err) {
+        if (err) {
+          return console.log(err);
+        }
+      });
+    } else {
+      console.log("We’ve encountered an error: " + error);
     }
+  });
+}
 
-    output += '};';
+module.exports = {
+  fetch: fetch
+};
 
-    fs.writeFile('tours.js', output, function (err) {
-      if (err) {
-        return console.log(err);
-      }
-    });
-  } else {
-    console.log("We’ve encountered an error: " + error);
-  }
-});
