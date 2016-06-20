@@ -93,7 +93,13 @@ function fetch() {
           output += '\t\'' + day + '\' : \'';
           for (var i = 0; i < daysEvents.length; i++) {
             output += '<a target="_blank" href="' + daysEvents[i].link + '">';
-            output += daysEvents[i].time + '</a> ';
+            output += daysEvents[i].time;
+            if (daysEvents[i].name && daysEvents[i].name.toLowerCase().indexOf('pub') !== -1) {
+              output += ' - Pub Experience';
+            } else {
+              output += ' - Walking tour';
+            }
+            output += '</a> ';
           }
           output += '\',\n';
         }
