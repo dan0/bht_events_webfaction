@@ -3,7 +3,13 @@
 var request = require("request");
 var cheerio = require("cheerio");
 var fs = require('fs');
-var url = "https://www.ticketsource.co.uk/belfasthiddentours";
+
+var requestOptions = {
+  url: 'https://www.ticketsource.co.uk/belfasthiddentours',
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36'
+  }
+}
 
 var OUTPUT_FILE = './eventdata.json';
 
@@ -55,7 +61,7 @@ function getADate(str) {
 }
 
 function fetch() {
-  request(url, function (error, response, body) {
+  request(requestOptions, function (error, response, body) {
     if (!error) {
       var $ = cheerio.load(body);
       var events = [];
